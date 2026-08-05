@@ -21,14 +21,15 @@ sys.path.append(str(BASE_DIR / "data" / "example"))
 import recalc_tat1_custom_points as recalc
 
 
-# Default Candidate Paths
-DEFAULT_INPUT_DIRS = [
-    BASE_DIR / "data" / "example" / "integrated_export",
-    BASE_DIR / "data" / "example" / "output_multi",
-    BASE_DIR / "f07_integrated_export",
-    BASE_DIR / "data" / "example" / "複数csvの例",
-]
+# ==========================================================
+# 設定エリア (パスを変更したい場合はここを書き換えてください)
+# ==========================================================
+# 入力ディレクトリ: measurement.parquet や profile.parquet が入っているフォルダ
+DEFAULT_INPUT_DIR = BASE_DIR / "data" / "example" / "integrated_export"
+
+# 出力Excelファイル: 機械学習用データセットの保存先
 DEFAULT_OUTPUT_EXCEL = BASE_DIR / "data" / "example" / "機械学習用データセット.xlsx"
+# ==========================================================
 
 
 def load_dataset_inputs(input_dir: Path):
@@ -207,19 +208,9 @@ def build_dataset(input_dir: Path, output_excel: Path) -> pd.DataFrame:
     return df
 
 
-def resolve_default_input_dir() -> Path:
-    for candidate in DEFAULT_INPUT_DIRS:
-        if candidate.exists() and (candidate / "measurement.parquet" in candidate.iterdir() or candidate / "measurement.csv" in candidate.iterdir()):
-            return candidate
-    # Fallback to the first default path or create default
-    return DEFAULT_INPUT_DIRS[0]
-
-
 def main():
-    default_input = resolve_default_input_dir()
-    
     parser = argparse.ArgumentParser(description="Build ML dataset directly from integrated parquet/CSV files.")
-    parser.add_argument("--input-dir", default=str(default_input), help=f"Directory containing measurement and profile data. (Default: {default_input})")
+    parser.add_argument("--input-dir", default=str(DEFAULT_INPUT_DIR), help=f"Directory containing measurement and profile data. (Default: {DEFAULT_INPUT_DIR})")
     parser.add_argument("--output-excel", default=str(DEFAULT_OUTPUT_EXCEL), help=f"Output Excel file path for the ML dataset. (Default: {DEFAULT_OUTPUT_EXCEL})")
     args = parser.parse_args()
 
