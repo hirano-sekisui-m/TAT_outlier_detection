@@ -1,0 +1,267 @@
+{
+    "schema_version": "1.0.0",
+    "project_name": "high_deviation_single_classification",
+    "description": "I\u5217\u304b\u3089AD\u5217\u306e\u6e2c\u5149\u7279\u5fb4\u91cf\u3092\u4f7f\u7528\u3057\u3001H\u5217\u300e205/206\u6bd4\u300f\u304b\u3089\u5b9a\u7fa9\u3057\u305f\u9ad8\u5024\u4e56\u96e2\u3092\u5358\u72ec\u5224\u5225\u3059\u308b\u305f\u3081\u306e\u30c7\u30fc\u30bf\u30bb\u30c3\u30c8\u69cb\u7bc9\u8a2d\u5b9a\u3002G\u5217\u300e\u4e56\u96e2\u533a\u5206\u300f\u306f\u5b66\u7fd2\u306b\u306f\u4f7f\u7528\u305b\u305a\u3001\u8a55\u4fa1\u30fb\u78ba\u8a8d\u7528\u3068\u3057\u3066\u306e\u307f\u4fdd\u6301\u53ef\u80fd\u3002",
+    "created_for": "RandomForestClassifier high-deviation model",
+    "data_source": {
+        "file_type": "xlsx",
+        "sheet_name": "\u6e2c\u5b9a\u5024_TAT1",
+        "header_row": 1,
+        "row_unit": "specimen",
+        "notes": "\u5143\u30c7\u30fc\u30bf\u306e\u5217\u4f4d\u7f6e\u306b\u4f9d\u5b58\u305b\u305a\u3001column_name\u3067\u53c2\u7167\u3059\u308b\u3053\u3068\u3092\u63a8\u5968\u3002"
+    },
+    "columns": {
+        "id_columns": [
+            {
+                "name": "source_index",
+                "role": "identifier",
+                "required": false
+            },
+            {
+                "name": "source_file",
+                "role": "identifier",
+                "required": false
+            },
+            {
+                "name": "global_request_id",
+                "role": "identifier",
+                "required": false
+            },
+            {
+                "name": "依頼No.",
+                "role": "identifier",
+                "required": false
+            },
+            {
+                "name": "SID",
+                "role": "identifier",
+                "required": false
+            },
+            {
+                "name": "属性",
+                "role": "metadata",
+                "required": false
+            }
+        ],
+        "evaluation_only_columns": [
+            {
+                "name": "\u4e56\u96e2\u533a\u5206",
+                "role": "evaluation_label_only",
+                "required": false,
+                "use_in_training": false,
+                "notes": "\u6b63\u89e3\u30e9\u30d9\u30eb\u3068\u3057\u3066\u5143\u30c7\u30fc\u30bf\u306b\u5b58\u5728\u3059\u308b\u304c\u3001\u5b66\u7fd2\u7279\u5fb4\u91cf\u30fb\u6559\u5e2b\u30e9\u30d9\u30eb\u4f5c\u6210\u306b\u306f\u4f7f\u7528\u3057\u306a\u3044\u3002\u8a55\u4fa1\u3084\u78ba\u8a8d\u7528\u306b\u306e\u307f\u4f7f\u7528\u53ef\u80fd\u3002"
+            }
+        ],
+        "target_source_column": {
+            "name": "",
+            "excel_column": "",
+            "dtype": "float",
+            "required": true,
+            "use_in_training_features": false,
+            "notes": "\u3053\u306e\u5217\u305d\u306e\u3082\u306e\u306f\u7279\u5fb4\u91cf\u306b\u306f\u542b\u3081\u306a\u3044\u3002\u9ad8\u5024\u4e56\u96e2\u306e\u76ee\u7684\u5909\u6570\u3092\u4f5c\u6210\u3059\u308b\u305f\u3081\u306b\u4f7f\u7528\u3059\u308b\u3002"
+        },
+        "feature_columns": [
+            {
+                "name": "装置生データ",
+                "excel_column": "I",
+                "dtype": "float",
+                "required": true
+            },
+            {
+                "name": "2-8",
+                "excel_column": "J",
+                "dtype": "float",
+                "required": true
+            },
+            {
+                "name": "4-10",
+                "excel_column": "K",
+                "dtype": "float",
+                "required": true
+            },
+            {
+                "name": "6-12",
+                "excel_column": "L",
+                "dtype": "float",
+                "required": true
+            },
+            {
+                "name": "8-14",
+                "excel_column": "M",
+                "dtype": "float",
+                "required": true
+            },
+            {
+                "name": "10-16",
+                "excel_column": "N",
+                "dtype": "float",
+                "required": true
+            },
+            {
+                "name": "12-18",
+                "excel_column": "O",
+                "dtype": "float",
+                "required": true
+            },
+            {
+                "name": "14-20",
+                "excel_column": "P",
+                "dtype": "float",
+                "required": true
+            },
+            {
+                "name": "\u5e73\u5747",
+                "excel_column": "Q",
+                "dtype": "float",
+                "required": true
+            },
+            {
+                "name": "\u6700\u5927",
+                "excel_column": "R",
+                "dtype": "float",
+                "required": true
+            },
+            {
+                "name": "\u6700\u5c0f",
+                "excel_column": "S",
+                "dtype": "float",
+                "required": true
+            },
+            {
+                "name": "\u30ec\u30f3\u30b8",
+                "excel_column": "T",
+                "dtype": "float",
+                "required": true
+            },
+            {
+                "name": "\u6700\u5927\u4e0a\u6607\u7387",
+                "excel_column": "U",
+                "dtype": "float",
+                "required": true
+            },
+            {
+                "name": "\u6700\u5927\u4e0a\u6607\u901f\u5ea6",
+                "excel_column": "V",
+                "dtype": "float",
+                "required": true
+            },
+            {
+                "name": "\u6700\u5927\u4e0b\u843d\u7387",
+                "excel_column": "W",
+                "dtype": "float",
+                "required": true
+            },
+            {
+                "name": "\u6700\u5927\u4e0b\u843d\u901f\u5ea6",
+                "excel_column": "X",
+                "dtype": "float",
+                "required": true
+            },
+            {
+                "name": "4-10/2-8",
+                "excel_column": "Y",
+                "dtype": "float",
+                "required": true
+            },
+            {
+                "name": "6-12/2-8",
+                "excel_column": "Z",
+                "dtype": "float",
+                "required": true
+            },
+            {
+                "name": "8-14/2-8",
+                "excel_column": "AA",
+                "dtype": "float",
+                "required": true
+            },
+            {
+                "name": "10-16/2-8",
+                "excel_column": "AB",
+                "dtype": "float",
+                "required": true
+            },
+            {
+                "name": "12-18/2-8",
+                "excel_column": "AC",
+                "dtype": "float",
+                "required": true
+            },
+            {
+                "name": "\u7d42\u70b9/\u59cb\u70b9",
+                "excel_column": "AD",
+                "dtype": "float",
+                "required": true
+            }
+        ]
+    },
+    "target_definition": {
+        "target_name": "target_high_deviation",
+        "target_type": "binary_classification",
+        "positive_class": 1,
+        "negative_class": 0,
+        "source_column": "205/206\u6bd4",
+        "rule": {
+            "operator": ">",
+            "threshold": 1.15
+        },
+        "positive_label": "\u9ad8\u5024\u4e56\u96e2",
+        "negative_label": "\u975e\u9ad8\u5024\u4e56\u96e2",
+        "python_expression": "df['205/206\u6bd4'].astype(float) > 1.15",
+        "notes": "H\u5217\u306e\u5024\u304c1.15\u3092\u8d85\u3048\u308b\u5834\u5408\u3092\u9ad8\u5024\u4e56\u96e2\u967d\u6027\u3068\u5b9a\u7fa9\u3059\u308b\u3002G\u5217\u300e\u4e56\u96e2\u533a\u5206\u300f\u306f\u3053\u306etarget\u4f5c\u6210\u306b\u306f\u4f7f\u308f\u306a\u3044\u3002"
+    },
+    "dataset_build_rules": {
+        "select_features_by": "column_name",
+        "feature_order_must_match_model": true,
+        "coerce_feature_dtype": "numeric_float",
+        "missing_value_policy": {
+            "strategy": "drop_rows_with_missing_in_required_features_or_target",
+            "applies_to": [
+                "feature_columns",
+                "target_source_column"
+            ]
+        },
+        "duplicate_policy": {
+            "strategy": "keep_all",
+            "notes": "\u91cd\u8907\u5224\u5b9a\u304c\u5fc5\u8981\u306a\u5834\u5408\u306f\u4f9d\u983cNo.\u3084SID\u3068\u306f\u5225\u306bsource_file/global_request_id\u3092\u542b\u3081\u3066\u78ba\u8a8d\u3059\u308b\u3002"
+        },
+        "label_leakage_prevention": {
+            "exclude_from_features": [
+                "\u4e56\u96e2\u533a\u5206",
+                "205/206\u6bd4"
+            ],
+            "notes": "G\u5217\u306f\u6b63\u89e3\u30e9\u30d9\u30eb\u3068\u3057\u3066\u3082\u5b66\u7fd2\u306b\u4f7f\u7528\u3057\u306a\u3044\u3002H\u5217\u306f\u76ee\u7684\u5909\u6570\u751f\u6210\u306e\u307f\u306b\u4f7f\u7528\u3057\u3001\u8aac\u660e\u5909\u6570\u306b\u306f\u542b\u3081\u306a\u3044\u3002"
+        }
+    },
+    "model_training_reference": {
+        "model_type": "RandomForestClassifier",
+        "random_state": 42,
+        "model_parameters": {
+            "n_estimators": 1000,
+            "min_samples_leaf": 3,
+            "class_weight": "balanced",
+            "n_jobs": -1
+        },
+        "validation": {
+            "method": "StratifiedKFold",
+            "n_splits": 5,
+            "shuffle": true,
+            "random_state": 42
+        },
+        "recommended_probability_threshold": 0.686,
+        "threshold_notes": "\u4ea4\u5dee\u691c\u8a3c\u3067F1\u304c\u6700\u5927\u4ed8\u8fd1\u3068\u306a\u3063\u305f\u9ad8\u5024\u4e56\u96e2\u78ba\u7387\u95be\u5024\u3002\u7528\u9014\u306b\u5fdc\u3058\u3066\u518d\u8abf\u6574\u53ef\u80fd\u3002"
+    },
+    "output_columns_recommended": [
+        "\u4f9d\u983cNo.",
+        "SID",
+        "205/206\u6bd4",
+        "target_high_deviation",
+        "probability_high_deviation",
+        "pred_high_deviation"
+    ],
+    "governance": {
+        "training_label_policy": "H\u5217\u304b\u3089\u4f5c\u6210\u3057\u305ftarget_high_deviation\u306e\u307f\u3092\u6559\u5e2b\u4fe1\u53f7\u306b\u4f7f\u7528\u3059\u308b",
+        "evaluation_label_policy": "G\u5217\u306f\u8a55\u4fa1\u30fb\u76ee\u8996\u78ba\u8a8d\u30fb\u30af\u30ed\u30b9\u96c6\u8a08\u306b\u306e\u307f\u4f7f\u7528\u53ef\u80fd",
+        "versioning_recommendation": "\u3053\u306eJSON\u3092\u5909\u66f4\u3057\u305f\u5834\u5408\u306fschema_version\u307e\u305f\u306fconfig_version\u3092\u66f4\u65b0\u3057\u3001\u30e2\u30c7\u30eb\u30d5\u30a1\u30a4\u30eb\u3068\u540c\u3058archive\u30d5\u30a9\u30eb\u30c0\u306b\u4fdd\u5b58\u3059\u308b"
+    }
+}
