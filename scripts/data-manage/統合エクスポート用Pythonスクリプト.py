@@ -693,7 +693,21 @@ def discover_input_files(args: argparse.Namespace) -> List[Path]:
             raise FileNotFoundError(f"CSVが見つかりません: {input_dir}")
         return files
 
-    # 引数なしで実行した場合は、スクリプトと同じディレクトリにある添付3ファイル名を探す。
+    # 引数なしで実行した場合の自動探索ディレクトリ候補
+    project_root = Path(__file__).resolve().parent.parent.parent
+    candidate_dirs = [
+        project_root / "data" / "example" / "複数csvの例",
+        project_root / "data" / "raw",
+        Path(__file__).resolve().parent,
+    ]
+
+    for cdir in candidate_dirs:
+        if cdir.exists():
+            csv_files = sorted(cdir.glob("*.csv"))
+            if csv_files:
+                return csv_files
+
+    # 添付3ファイル名の自動フォールバック
     base_dir = Path(__file__).resolve().parent
     files = [base_dir / name for name in DEFAULT_ATTACHED_FILES]
     existing = [p for p in files if p.exists()]
@@ -704,10 +718,13 @@ def discover_input_files(args: argparse.Namespace) -> List[Path]:
 
 
 def build_arg_parser() -> argparse.ArgumentParser:
-    parser = argparse.ArgumentParser(description="F07 CSV 3ファイル統合エクスポートスクリプト")
+    project_root = Path(__file__).resolve().parent.parent.parent
+    default_output = project_root / "data" / "example" / "integrated_export"
+
+    parser = argparse.ArgumentParser(description="F07 CSV 統合エクスポートスクリプト")
     parser.add_argument("csv_files", nargs="*", help="統合対象CSVファイル")
     parser.add_argument("--input-dir", default=None, help="CSVをまとめて読み込むディレクトリ")
-    parser.add_argument("--output-dir", default="./f07_integrated_export", help="出力先ディレクトリ")
+    parser.add_argument("--output-dir", default=str(default_output), help=f"出力先ディレクトリ (既定: {default_output})")
     parser.add_argument("--no-csv", action="store_true", help="確認用CSVを出力しない")
     parser.add_argument("--move-processed", action="store_true", help="成功後、入力CSVを processed/ に移動する")
     return parser

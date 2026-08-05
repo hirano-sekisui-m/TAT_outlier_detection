@@ -21,6 +21,16 @@ sys.path.append(str(BASE_DIR / "data" / "example"))
 import recalc_tat1_custom_points as recalc
 
 
+# Default Candidate Paths
+DEFAULT_INPUT_DIRS = [
+    BASE_DIR / "data" / "example" / "integrated_export",
+    BASE_DIR / "data" / "example" / "output_multi",
+    BASE_DIR / "f07_integrated_export",
+    BASE_DIR / "data" / "example" / "複数csvの例",
+]
+DEFAULT_OUTPUT_EXCEL = BASE_DIR / "data" / "example" / "機械学習用データセット.xlsx"
+
+
 def load_dataset_inputs(input_dir: Path):
     """
     Load measurement and profile data from input_dir.
@@ -170,7 +180,6 @@ def build_dataset(input_dir: Path, output_excel: Path) -> pd.DataFrame:
             rate_value = rates_lookup.get((pattern_name, global_id), np.nan)
             cal_rates, cal_concs, _ = recalc.find_curve(curves, pattern_name, source_index)
             val = recalc.interpolate_or_extrapolate(rate_value, cal_rates, cal_concs)
-            # Use pattern_name directly (e.g., '2-8', '4-10') to match target Excel columns
             output_row[pattern_name] = val
 
         # Calculate summary features and relative ratio columns
@@ -198,13 +207,30 @@ def build_dataset(input_dir: Path, output_excel: Path) -> pd.DataFrame:
     return df
 
 
+def resolve_default_input_dir() -> Path:
+    for candidate in DEFAULT_INPUT_DIRS:
+        if candidate.exists() and (candidate / "measurement.parquet" in candidate.iterdir() or candidate / "measurement.csv" in candidate.iterdir()):
+            return candidate
+    # Fallback to the first default path or create default
+    return DEFAULT_INPUT_DIRS[0]
+
+
 def main():
+    default_input = resolve_default_input_dir()
+    
     parser = argparse.ArgumentParser(description="Build ML dataset directly from integrated parquet/CSV files.")
-    parser.add_argument("--input-dir", required=True, help="Directory containing measurement and profile data.")
-    parser.add_argument("--output-excel", required=True, help="Output Excel file path for the ML dataset.")
+    parser.add_argument("--input-dir", default=str(default_input), help=f"Directory containing measurement and profile data. (Default: {default_input})")
+    parser.add_argument("--output-excel", default=str(DEFAULT_OUTPUT_EXCEL), help=f"Output Excel file path for the ML dataset. (Default: {DEFAULT_OUTPUT_EXCEL})")
     args = parser.parse_args()
 
-    build_dataset(Path(args.input_dir), Path(args.output_excel))
+    input_path = Path(args.input_dir)
+    output_path = Path(args.output_excel)
+
+    if not input_path.exists():
+        print(f"Error: Input directory '{input_path}' does not exist.")
+        sys.exit(1)
+
+    build_dataset(input_path, output_path)
     print("Done.")
 
 
