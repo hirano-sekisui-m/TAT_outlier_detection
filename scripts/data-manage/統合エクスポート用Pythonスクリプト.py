@@ -46,8 +46,17 @@ import pandas as pd
 
 
 # ==========================================================
-# Constants
+# 設定エリア (パスを変更したい場合はここを書き換えてください)
 # ==========================================================
+PROJECT_ROOT = Path(__file__).resolve().parent.parent.parent
+
+# 入力生CSVが含まれるフォルダパス
+DEFAULT_INPUT_DIR = PROJECT_ROOT / "data" / "example" / "複数csvの例"
+
+# 統合データ (measurement.parquet, profile.parquet等) の出力先フォルダパス
+DEFAULT_OUTPUT_DIR = PROJECT_ROOT / "data" / "example" / "integrated_export"
+# ==========================================================
+
 
 DEFAULT_ATTACHED_FILES = [
     "240624 F07---TAT高値検体-スクリ－ニング (1～40).csv",
@@ -191,14 +200,16 @@ def read_csv_lines(csv_path: Path) -> Tuple[List[str], str]:
     for enc in encodings:
         try:
             with open(csv_path, "r", encoding=enc, errors="strict", newline="") as f:
-                return f.readlines(), enc
+                lines = [line.replace("\x00", "") for line in f.readlines()]
+                return lines, enc
         except Exception as exc:
             last_exc = exc
 
     # 最終フォールバック。壊れた文字は置換して処理を継続する。
     try:
         with open(csv_path, "r", encoding="cp932", errors="replace", newline="") as f:
-            return f.readlines(), "cp932(errors=replace)"
+            lines = [line.replace("\x00", "") for line in f.readlines()]
+            return lines, "cp932(errors=replace)"
     except Exception as exc:
         raise RuntimeError(f"CSVを読み込めません: {csv_path}, last_error={last_exc!r}") from exc
 
@@ -684,28 +695,27 @@ def discover_input_files(args: argparse.Namespace) -> List[Path]:
     if args.csv_files:
         return [Path(p) for p in args.csv_files]
 
-    if args.input_dir:
-        input_dir = Path(args.input_dir)
+    input_dir = Path(args.input_dir) if args.input_dir else Path(DEFAULT_INPUT_DIR)
+    if input_dir.exists():
         files = sorted(input_dir.glob("*.csv"))
-        if not files:
-            raise FileNotFoundError(f"CSVが見つかりません: {input_dir}")
-        return files
+        if files:
+            return files
 
-    # 引数なしで実行した場合は、スクリプトと同じディレクトリにある添付3ファイル名を探す。
+    # 添付3ファイル名の自動フォールバック
     base_dir = Path(__file__).resolve().parent
     files = [base_dir / name for name in DEFAULT_ATTACHED_FILES]
     existing = [p for p in files if p.exists()]
     if existing:
         return existing
 
-    raise FileNotFoundError("入力CSVが指定されていません。csv_files または --input-dir を指定してください。")
+    raise FileNotFoundError(f"入力CSVが見つかりません: {input_dir}")
 
 
 def build_arg_parser() -> argparse.ArgumentParser:
-    parser = argparse.ArgumentParser(description="F07 CSV 3ファイル統合エクスポートスクリプト")
+    parser = argparse.ArgumentParser(description="F07 CSV 統合エクスポートスクリプト")
     parser.add_argument("csv_files", nargs="*", help="統合対象CSVファイル")
-    parser.add_argument("--input-dir", default=None, help="CSVをまとめて読み込むディレクトリ")
-    parser.add_argument("--output-dir", default="./f07_integrated_export", help="出力先ディレクトリ")
+    parser.add_argument("--input-dir", default=None, help=f"CSVをまとめて読み込むディレクトリ (既定: {DEFAULT_INPUT_DIR})")
+    parser.add_argument("--output-dir", default=str(DEFAULT_OUTPUT_DIR), help=f"出力先ディレクトリ (既定: {DEFAULT_OUTPUT_DIR})")
     parser.add_argument("--no-csv", action="store_true", help="確認用CSVを出力しない")
     parser.add_argument("--move-processed", action="store_true", help="成功後、入力CSVを processed/ に移動する")
     return parser

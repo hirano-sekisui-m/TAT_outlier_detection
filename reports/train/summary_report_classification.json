@@ -1,0 +1,141 @@
+{
+  "task_type": "classification",
+  "target_definition": "14-20/2-8 > 1.15",
+  "executed_at": "2026-08-06 06:36:51",
+  "dataset": "/Users/hiranotakahiro/Desktop/TAT_outlier_detection/data/example/機械学習用データセット.xlsx",
+  "n_samples": 114,
+  "features": [
+    "TAT1装置生データ",
+    "2-8",
+    "4-10",
+    "6-12",
+    "8-14",
+    "10-16",
+    "12-18",
+    "14-20",
+    "平均",
+    "最大",
+    "最小",
+    "レンジ",
+    "最大上昇率",
+    "最大上昇速度",
+    "最大下落率",
+    "最大下落速度",
+    "4-10/2-8",
+    "6-12/2-8",
+    "8-14/2-8",
+    "10-16/2-8",
+    "12-18/2-8",
+    "14-20/2-8"
+  ],
+  "best_model": "GradientBoosting",
+  "metrics_summary": [
+    {
+      "Model": "GradientBoosting",
+      "Accuracy": 1.0,
+      "Precision": 1.0,
+      "Recall": 1.0,
+      "F1-Score": 1.0,
+      "ROC-AUC": 1.0,
+      "PR-AUC": 1.0,
+      "TP": 37,
+      "FP": 0,
+      "FN": 0,
+      "TN": 77
+    },
+    {
+      "Model": "RandomForest",
+      "Accuracy": 0.9912280701754386,
+      "Precision": 0.9736842105263158,
+      "Recall": 1.0,
+      "F1-Score": 0.9866666666666667,
+      "ROC-AUC": 0.9982449982449982,
+      "PR-AUC": 0.9962404381741675,
+      "TP": 37,
+      "FP": 1,
+      "FN": 0,
+      "TN": 76
+    },
+    {
+      "Model": "ExtraTrees",
+      "Accuracy": 0.956140350877193,
+      "Precision": 0.9705882352941176,
+      "Recall": 0.8918918918918919,
+      "F1-Score": 0.9295774647887324,
+      "ROC-AUC": 0.9764829764829766,
+      "PR-AUC": 0.956458078729884,
+      "TP": 33,
+      "FP": 1,
+      "FN": 4,
+      "TN": 76
+    },
+    {
+      "Model": "LogisticRegression",
+      "Accuracy": 0.9473684210526315,
+      "Precision": 0.9428571428571428,
+      "Recall": 0.8918918918918919,
+      "F1-Score": 0.9166666666666666,
+      "ROC-AUC": 0.9768339768339769,
+      "PR-AUC": 0.9462834384757888,
+      "TP": 33,
+      "FP": 2,
+      "FN": 4,
+      "TN": 75
+    },
+    {
+      "Model": "SVC",
+      "Accuracy": 0.9298245614035088,
+      "Precision": 0.967741935483871,
+      "Recall": 0.8108108108108109,
+      "F1-Score": 0.8823529411764706,
+      "ROC-AUC": 0.9638469638469638,
+      "PR-AUC": 0.9059319052721928,
+      "TP": 30,
+      "FP": 1,
+      "FN": 7,
+      "TN": 76
+    }
+  ],
+  "top_features": [
+    {
+      "Feature": "14-20/2-8",
+      "Average_Importance": 1.0285082436956274
+    },
+    {
+      "Feature": "12-18/2-8",
+      "Average_Importance": 0.43470079868342915
+    },
+    {
+      "Feature": "10-16/2-8",
+      "Average_Importance": 0.36316834033794376
+    },
+    {
+      "Feature": "6-12/2-8",
+      "Average_Importance": 0.17482990563065975
+    },
+    {
+      "Feature": "8-14/2-8",
+      "Average_Importance": 0.1262536363826433
+    },
+    {
+      "Feature": "最大下落率",
+      "Average_Importance": 0.12355750832692984
+    },
+    {
+      "Feature": "TAT1装置生データ",
+      "Average_Importance": 0.11049360972893983
+    },
+    {
+      "Feature": "レンジ",
+      "Average_Importance": 0.10895081621590291
+    },
+    {
+      "Feature": "4-10/2-8",
+      "Average_Importance": 0.09585827924181653
+    },
+    {
+      "Feature": "4-10",
+      "Average_Importance": 0.08918438772911419
+    }
+  ]
+}

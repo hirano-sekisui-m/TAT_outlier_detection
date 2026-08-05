@@ -1,23 +1,33 @@
-# 高値乖離単独判別モデル
+# TAT 異常検知・高値乖離分析パイプライン
 
-## 目的
-I列～AD列の特徴量から、高値乖離検体を判別する。
+本リポジトリは、F07装置生データCSVの統合、7測光ポイント濃度再計算＆特徴量データセット構築、機械学習（分類・回帰）モデルの自動学習・評価、および未知データの推論・予測までを一貫して行う全自動パイプラインです。
 
-## 正解定義
-H列「205/206比」 > 1.15 を高値乖離と定義する。
-G列「乖離区分」は学習には使用しない。
+---
 
-## 使用モデル
-RandomForestClassifier
+## 全体ドキュメント一覧 (`docs/`)
 
-## 使用特徴量
-装置生データ, 2-8, 4-10, ..., 終点/始点
+システム全体の仕様およびスクリプトごとの取扱説明書は以下をご参照ください。
 
-## 推奨判定閾値
-高値乖離確率 >= 0.686
+- **[全体ワークフロー概要 (workflow_overview.md)](file:///Users/hiranotakahiro/Desktop/TAT_outlier_detection/docs/workflow_overview.md)**: パイプライン全体のフロー図、構造、および概要
+- **[データセット構築の取説 (dataset_building_guide.md)](file:///Users/hiranotakahiro/Desktop/TAT_outlier_detection/docs/dataset_building_guide.md)**: 生データ統合および特徴量Excel構築スクリプトの取説
+- **[モデル学習＆評価の取説 (ml_training_guide.md)](file:///Users/hiranotakahiro/Desktop/TAT_outlier_detection/docs/ml_training_guide.md)**: 分類・回帰モデル構築＆多モデル評価サマリー出力スクリプトの取説
+- **[未知データ予測の取説 (ml_prediction_guide.md)](file:///Users/hiranotakahiro/Desktop/TAT_outlier_detection/docs/ml_prediction_guide.md)**: 保存モデルによる未知データ推論スクリプトの取説
 
-## 実行例
-python scripts/validate/validate_high_deviation_rf.py \
-  --input data/raw/乖離特徴分析2_測光6ポイント_TAT1のみ.xlsx \
-  --model models/production/high_deviation_rf_classifier.joblib \
-  --output outputs/predictions/predictions.csv
+---
+
+## クイック実行
+
+```bash
+# 1. 生CSVデータのパースと統合
+python scripts/data-manage/統合エクスポート用Pythonスクリプト.py
+
+# 2. 機械学習用特徴量データセットの生成
+python scripts/data-manage/build_ml_dataset.py
+
+# 3. 分類・回帰モデルの学習、評価、サマリー出力
+python scripts/train/train_ml_models.py --task-type classification
+python scripts/train/train_ml_models.py --task-type regression
+
+# 4. 未知データに対する予測実行
+python scripts/validate/predict_ml_models.py
+```
