@@ -1,0 +1,59 @@
+{
+  "model": "/mnt/data/high_deviation_rf_classifier.joblib",
+  "input": "/mnt/data/乖離特徴分析2_測光6ポイント_TAT1のみ.xlsx",
+  "output": "/mnt/data/high_deviation_rf_predictions_from_script.csv",
+  "n_rows_input": 189,
+  "n_rows_scored": 189,
+  "threshold": 0.686,
+  "target_definition": "205/206比 > 1.15",
+  "features_used": [
+    "装置生データ",
+    "2-8",
+    "4-10",
+    "6-12",
+    "8-14",
+    "10-16",
+    "12-18",
+    "14-20",
+    "平均",
+    "最大",
+    "最小",
+    "レンジ",
+    "最大上昇率",
+    "最大上昇速度",
+    "最大下落率",
+    "最大下落速度",
+    "4-10/2-8",
+    "6-12/2-8",
+    "8-14/2-8",
+    "10-16/2-8",
+    "12-18/2-8",
+    "終点/始点"
+  ],
+  "note": "G列 乖離区分 は推論には使用していません。",
+  "evaluation": {
+    "threshold": 0.686,
+    "tp": 26,
+    "fp": 2,
+    "fn": 5,
+    "tn": 156,
+    "precision": 0.9285714285714286,
+    "recall": 0.8387096774193549,
+    "f1": 0.8813559322033898,
+    "accuracy": 0.9629629629629629,
+    "auc": 0.995100040832993,
+    "average_precision": 0.9753662083927737
+  },
+  "crosstab_label_eval_only": {
+    "false": {
+      "低値乖離": 23,
+      "非乖離": 133,
+      "高値乖離": 5
+    },
+    "true": {
+      "低値乖離": 0,
+      "非乖離": 2,
+      "高値乖離": 26
+    }
+  }
+}

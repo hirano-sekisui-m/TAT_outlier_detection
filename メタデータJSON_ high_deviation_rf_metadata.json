@@ -1,0 +1,59 @@
+{
+  "input_file": "/mnt/data/乖離特徴分析2_測光6ポイント_TAT1のみ.xlsx",
+  "n_rows_used": 189,
+  "n_positive_H_gt_1_15": 31,
+  "n_negative": 158,
+  "feature_cols": [
+    "装置生データ",
+    "2-8",
+    "4-10",
+    "6-12",
+    "8-14",
+    "10-16",
+    "12-18",
+    "14-20",
+    "平均",
+    "最大",
+    "最小",
+    "レンジ",
+    "最大上昇率",
+    "最大上昇速度",
+    "最大下落率",
+    "最大下落速度",
+    "4-10/2-8",
+    "6-12/2-8",
+    "8-14/2-8",
+    "10-16/2-8",
+    "12-18/2-8",
+    "終点/始点"
+  ],
+  "target_definition": "205/206比 > 1.15",
+  "probability_threshold": 0.686,
+  "cv": {
+    "type": "StratifiedKFold",
+    "n_splits": 5,
+    "shuffle": true,
+    "random_state": 42
+  },
+  "cv_metrics_at_threshold": {
+    "threshold": 0.686,
+    "tp": 22,
+    "fp": 5,
+    "fn": 9,
+    "tn": 153,
+    "precision": 0.8148148148148148,
+    "recall": 0.7096774193548387,
+    "f1": 0.7586206896551724,
+    "accuracy": 0.9259259259259259,
+    "auc": 0.9138423846467946,
+    "average_precision": 0.748123077914841
+  },
+  "model_file": "/mnt/data/high_deviation_rf_classifier.joblib",
+  "cv_predictions_file": "/mnt/data/high_deviation_rf_cv_predictions.csv",
+  "versions": {
+    "python": "3.12.9",
+    "sklearn": "1.5.1",
+    "pandas": "2.2.2",
+    "numpy": "1.26.4"
+  }
+}
