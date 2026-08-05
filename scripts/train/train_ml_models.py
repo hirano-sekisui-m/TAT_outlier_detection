@@ -14,6 +14,7 @@ import sys
 import warnings
 from pathlib import Path
 from datetime import datetime
+from typing import Tuple
 
 warnings.filterwarnings("ignore")
 
@@ -78,9 +79,10 @@ TASK_TYPE = "classification"
 
 
 # 3. 正解ラベル (Target) の動的定義関数
-def define_target_label(df: pd.DataFrame, task_type: str = TASK_TYPE) -> pd.Series:
+def define_target_label(df: pd.DataFrame, task_type: str = TASK_TYPE) -> Tuple[pd.Series, str]:
     """
     Pythonスクリプト内で正解ラベル(目的変数)を柔軟に定義します。
+    (ターゲット要素の Series, 正解ラベルの定義説明テキスト) のタプルを返します。
     
     【分類タスク (classification) の例】
       - 14-20/2-8 (終点/始点比率) が 1.15 を超える場合を 1 (高高値/高乖離陽性)、それ以外を 0
@@ -91,16 +93,22 @@ def define_target_label(df: pd.DataFrame, task_type: str = TASK_TYPE) -> pd.Seri
     if task_type == "classification":
         if "14-20/2-8" in df.columns:
             val = pd.to_numeric(df["14-20/2-8"], errors="coerce")
-            return (val > 1.15).astype(int)
+            target = (val > 1.15).astype(int)
+            target_def = "14-20/2-8 > 1.15"
         elif "終点/始点" in df.columns:
             val = pd.to_numeric(df["終点/始点"], errors="coerce")
-            return (val > 1.15).astype(int)
+            target = (val > 1.15).astype(int)
+            target_def = "終点/始点 > 1.15"
         else:
             val = pd.to_numeric(df.get("TAT1装置生データ", 0), errors="coerce")
-            return (val > 5.0).astype(int)
+            target = (val > 5.0).astype(int)
+            target_def = "TAT1装置生データ > 5.0"
+        return target, target_def
 
     elif task_type == "regression":
-        return pd.to_numeric(df["TAT1装置生データ"], errors="coerce")
+        target = pd.to_numeric(df["TAT1装置生データ"], errors="coerce")
+        target_def = "TAT1装置生データ"
+        return target, target_def
 
     else:
         raise ValueError(f"未知のタスク種別です: {task_type}. 'classification' または 'regression' を指定してください。")
@@ -300,7 +308,9 @@ def run_training(
         df = pd.read_csv(input_dataset)
 
     # 2. 正解ラベルの動的付与
-    df["target"] = define_target_label(df, task_type=task_type)
+    target_series, target_definition = define_target_label(df, task_type=task_type)
+    df["target"] = target_series
+    print(f"Target Label Defined: {target_definition}")
 
     # 特徴量列の抽出と変換
     available_features = [c for c in FEATURE_COLS if c in df.columns]
@@ -379,6 +389,7 @@ def run_training(
         "model": best_model,
         "model_name": best_model_name,
         "task_type": task_type,
+        "target_definition": target_definition,
         "feature_cols": available_features,
         "metrics": df_metrics.to_dict(orient="records"),
         "trained_at": datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
@@ -404,6 +415,7 @@ def run_training(
         summary_info = pd.DataFrame([
             {"項目": "実行日時", "値": datetime.now().strftime("%Y-%m-%d %H:%M:%S")},
             {"項目": "タスク種別", "値": task_type.upper()},
+            {"項目": "正解ラベル定義", "値": target_definition},
             {"項目": "入力データセット", "値": str(input_dataset)},
             {"項目": "全行数", "値": len(df)},
             {"項目": "学習使用行数", "値": len(X_clean)},
@@ -416,10 +428,11 @@ def run_training(
     format_excel_report(excel_report_path)
     print(f"Saved Excel summary report to: {excel_report_path}")
 
-    # JSON形式サマリー保存
+    # JSON形式サマリー保存 (正解ラベル定義 target_definition を追加)
     json_report_path = report_dir / f"summary_report_{task_type}.json"
     report_json = {
         "task_type": task_type,
+        "target_definition": target_definition,
         "executed_at": datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
         "dataset": str(input_dataset),
         "n_samples": len(X_clean),

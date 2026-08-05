@@ -36,11 +36,11 @@
    - **Model_Comparison**: 全モデルの性能比較表（ヘッダー装飾・書式指定済み）
    - **Feature_Importances**: 特徴量重要度 / 係数絶対値のランキング表
    - **CV_Predictions**: 各サンプルの交差検証（CV）による予測値・予測確率データ
-   - **Run_Summary**: 実行日時・データ件数・使用モデル等のメタデータ
+   - **Run_Summary**: 実行日時・正解ラベル定義 (`target_definition`)・データ件数・使用モデル等のメタデータ
 2. **JSON サマリーレポート (`summary_report_classification.json` / `summary_report_regression.json`)**
-   - 他システム連携や自動化処理で扱いやすい構造化データ
+   - `target_definition`: 正解ラベル（目的変数）の定義内容（例: `"14-20/2-8 > 1.15"` または `"TAT1装置生データ"`）を含む構造化データ
 3. **最優秀モデルファイル (`best_model_*.joblib`)**
-   - 5-Fold CVで最も優れたスコア（分類: F1/AUC, 回帰: R²/RMSE）を獲得した学習済みモデルオブジェクト
+   - 5-Fold CVで最も優れたスコア（分類: F1/AUC, 回帰: R²/RMSE）を獲得した学習済みモデルオブジェクト（ターゲット定義メタデータ内包）
 
 ---
 
