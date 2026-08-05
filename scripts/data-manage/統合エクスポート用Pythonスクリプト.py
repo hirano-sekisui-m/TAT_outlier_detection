@@ -191,14 +191,16 @@ def read_csv_lines(csv_path: Path) -> Tuple[List[str], str]:
     for enc in encodings:
         try:
             with open(csv_path, "r", encoding=enc, errors="strict", newline="") as f:
-                return f.readlines(), enc
+                lines = [line.replace("\x00", "") for line in f.readlines()]
+                return lines, enc
         except Exception as exc:
             last_exc = exc
 
     # 最終フォールバック。壊れた文字は置換して処理を継続する。
     try:
         with open(csv_path, "r", encoding="cp932", errors="replace", newline="") as f:
-            return f.readlines(), "cp932(errors=replace)"
+            lines = [line.replace("\x00", "") for line in f.readlines()]
+            return lines, "cp932(errors=replace)"
     except Exception as exc:
         raise RuntimeError(f"CSVを読み込めません: {csv_path}, last_error={last_exc!r}") from exc
 
