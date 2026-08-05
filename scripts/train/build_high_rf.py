@@ -9,10 +9,10 @@ from sklearn.ensemble import RandomForestClassifier
 from sklearn.model_selection import StratifiedKFold, cross_val_predict
 from sklearn.metrics import confusion_matrix, precision_recall_fscore_support, roc_auc_score, average_precision_score
 
-INPUT = Path('/mnt/data/乖離特徴分析2_測光6ポイント_TAT1のみ.xlsx')
-MODEL_OUT = Path('/mnt/data/high_deviation_rf_classifier.joblib')
-META_OUT = Path('/mnt/data/high_deviation_rf_metadata.json')
-PRED_OUT = Path('/mnt/data/high_deviation_rf_cv_predictions.csv')
+INPUT = Path('data/raw/乖離特徴分析2_測光6ポイント_TAT1のみ.xlsx')
+MODEL_OUT = Path('models/production/high_deviation_rf_classifier.joblib')
+META_OUT = Path('models/production/high_deviation_rf_metadata.json')
+PRED_OUT = Path('reports/validation/high_deviation_rf_cv_predictions.csv')
 
 RANDOM_STATE = 42
 POSITIVE_THRESHOLD_RATIO = 1.15
