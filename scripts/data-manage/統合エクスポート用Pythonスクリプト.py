@@ -188,6 +188,22 @@ def load_parsed_data(parsed_dir: Path | str) -> tuple[pd.DataFrame, pd.DataFrame
 
 
 # ==========================================================
+# ID / Label helpers
+# ==========================================================
+
+def clean_id_series(series: pd.Series) -> pd.Series:
+    """ID系カラム（依頼No., SID, 検体ﾊﾞｰｺｰﾄﾞなど）を正規化する。"""
+    return (
+        series.astype(str)
+        .str.replace('"', "", regex=False)
+        .str.strip()
+        .replace("nan", "")
+        .replace("None", "")
+        .replace("<NA>", "")
+    )
+
+
+# ==========================================================
 # Read helpers
 # ==========================================================
 
@@ -289,7 +305,7 @@ def parse_measurement_table(lines: Sequence[str]) -> tuple[pd.DataFrame, dict[st
     for col in fixed_cols:
         clean_col = normalize_label(col)
         if clean_col:
-            out[clean_col] = df_raw[col].astype(str).str.strip().replace("nan", "")
+            out[clean_col] = clean_id_series(df_raw[col])
 
     measurement_items: list[str] = []
     measurement_units: dict[str, str] = {}
@@ -506,7 +522,8 @@ def add_source_columns(df: pd.DataFrame, source_file: str, source_index: int) ->
     out.insert(1, "source_file", source_file)
 
     if "依頼No." in out.columns:
-        req = out["依頼No."].astype(str).str.strip()
+        req = clean_id_series(out["依頼No."])
+        out["依頼No."] = req
     else:
         req = pd.Series(range(1, len(out) + 1), index=out.index).astype(str)
 
