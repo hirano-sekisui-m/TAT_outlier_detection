@@ -1,6 +1,8 @@
+# Python cacheなど
 __pycache__/
 *.pyc
 
+# 環境
 .venv/
 
 # 測定データなど
@@ -9,6 +11,7 @@ data/260806_検証用/
 
 # モデル構築レポート
 reports/
+reports/validation/
 
 # 学習済みモデル
 models/
