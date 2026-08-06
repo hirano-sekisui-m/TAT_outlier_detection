@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 """
 Predict & Validate Script for Trained ML Models.
 
@@ -7,10 +6,9 @@ Loads a saved model (.joblib) and evaluates / predicts on unknown new dataset (.
 """
 
 import argparse
-import json
-import sys
+import logging
+from datetime import datetime, timezone
 from pathlib import Path
-from datetime import datetime
 
 import joblib
 import numpy as np
@@ -22,6 +20,7 @@ from openpyxl.worksheet.table import Table, TableStyleInfo
 
 PROJECT_ROOT = Path(__file__).resolve().parent.parent.parent
 
+logger = logging.getLogger(__name__)
 
 # ==========================================================
 # 設定エリア (パスを変更したい場合はここを書き換えてください)
@@ -67,8 +66,8 @@ def format_excel_report(excel_path: Path):
                     showColumnStripes=False,
                 )
                 ws.add_table(table)
-            except Exception:
-                pass
+            except Exception as e:  # noqa: BLE001
+                logger.warning(f"Failed to add table to worksheet {ws.title}: {e}")
 
         for col_idx in range(1, ws.max_column + 1):
             col_letter = get_column_letter(col_idx)
@@ -155,7 +154,7 @@ def predict_dataset(
         output_df.to_excel(writer, sheet_name="Predictions", index=False)
         
         info_df = pd.DataFrame([
-            {"項目": "推論実行日時", "値": datetime.now().strftime("%Y-%m-%d %H:%M:%S")},
+            {"項目": "推論実行日時", "値": datetime.now(timezone.utc).strftime("%Y-%m-%d %H:%M:%S")},
             {"項目": "使用モデル", "値": model_name},
             {"項目": "タスク種別", "値": task_type.upper()},
             {"項目": "正解ラベル定義", "値": target_definition},
