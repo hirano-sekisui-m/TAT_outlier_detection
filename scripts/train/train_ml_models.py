@@ -71,7 +71,7 @@ DEFAULT_MODEL_DIR = PROJECT_ROOT / "models" / "trained" /"260806_TAT1_ml_models"
 
 
 # 2. タスク種別の選択: "classification" (分類) または "regression" (回帰)
-TASK_TYPE = "classification"
+TASK_TYPE = "regression"
 
 
 # 3. 正解ラベル (Target) の動的定義関数

@@ -27,13 +27,13 @@ logger = logging.getLogger(__name__)
 # ==========================================================
 
 # 1. 検証・予測対象の未知データセット (Excel / CSV)
-DEFAULT_INPUT_DATASET = PROJECT_ROOT / "data" / "example" / "機械学習用データセット.xlsx"
+DEFAULT_INPUT_DATASET = PROJECT_ROOT / "data" / "260806_検証用" / "260806_ML_dataset.xlsx"
 
 # 2. 読み込む学習済みモデル (.joblib)
-DEFAULT_MODEL_FILE = PROJECT_ROOT / "models" / "trained" / "best_model_classification_GradientBoosting.joblib"
+DEFAULT_MODEL_FILE = PROJECT_ROOT / "models" / "trained" / "260806_TAT1_ml_models" / "best_model_regression_RandomForestRegressor.joblib"
 
 # 3. 予測結果の出力Excelファイルパス
-DEFAULT_OUTPUT_EXCEL = PROJECT_ROOT / "reports" / "validation" / "prediction_results.xlsx"
+DEFAULT_OUTPUT_EXCEL = PROJECT_ROOT / "reports" / "validation" / "regression_prediction_results.xlsx"
 
 # ==========================================================
 
