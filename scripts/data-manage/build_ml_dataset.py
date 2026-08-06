@@ -1,5 +1,3 @@
-#!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 """
 Build ML Dataset for TAT Outlier Detection.
 
@@ -8,9 +6,9 @@ matching the specification in `data/example/機械学習用データセット目
 """
 
 import argparse
+import json
 import sys
 from pathlib import Path
-import json
 
 import numpy as np
 import pandas as pd
@@ -18,8 +16,7 @@ import pandas as pd
 # Add data/example directory to path to import recalc_tat1_custom_points
 BASE_DIR = Path(__file__).resolve().parent.parent.parent
 sys.path.append(str(BASE_DIR / "data" / "example"))
-import recalc_tat1_custom_points as recalc
-
+import recalc_tat1_custom_points as recalc  # type: ignore
 
 # ==========================================================
 # 設定エリア (パスを変更したい場合はここを書き換えてください)
@@ -149,7 +146,7 @@ def build_dataset(input_dir: Path, output_excel: Path) -> pd.DataFrame:
     Build machine learning dataset from integrated export directory.
     """
     print(f"Loading data from {input_dir}")
-    meas_df, profile_df, metadata = load_dataset_inputs(input_dir)
+    meas_df, profile_df, _metadata = load_dataset_inputs(input_dir)
     meas_df["SampleType"] = meas_df.get("属性", "").apply(recalc.classify_sample_type)
 
     rates_by_pattern = recalc.build_rates(profile_df)
