@@ -2,3 +2,13 @@ __pycache__/
 *.pyc
 
 .venv/
+
+# 測定データなど
+data/dictionary/
+data/260806_検証用/
+
+# モデル構築レポート
+reports/
+
+# 学習済みモデル
+models/

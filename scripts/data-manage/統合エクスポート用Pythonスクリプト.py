@@ -50,10 +50,10 @@ import pandas as pd
 PROJECT_ROOT = Path(__file__).resolve().parent.parent.parent
 
 # 入力生CSVが含まれるフォルダパス
-DEFAULT_INPUT_DIR = PROJECT_ROOT / "data" / "example" / "複数csvの例"
+DEFAULT_INPUT_DIR = PROJECT_ROOT / "data" / "260806_検証用"
 
 # 統合データ (measurement.parquet, profile.parquet等) の出力先フォルダパス
-DEFAULT_OUTPUT_DIR = PROJECT_ROOT / "data" / "example" / "integrated_export"
+DEFAULT_OUTPUT_DIR = PROJECT_ROOT / "data" / "260806_検証用" / "260806_integrated_export"
 # ==========================================================
 
 

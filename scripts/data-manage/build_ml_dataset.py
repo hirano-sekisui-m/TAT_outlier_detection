@@ -22,10 +22,10 @@ import recalc_tat1_custom_points as recalc  # type: ignore
 # 設定エリア (パスを変更したい場合はここを書き換えてください)
 # ==========================================================
 # 入力ディレクトリ: measurement.parquet や profile.parquet が入っているフォルダ
-DEFAULT_INPUT_DIR = BASE_DIR / "data" / "example" / "integrated_export"
+DEFAULT_INPUT_DIR = BASE_DIR / "data" / "260806_検証用" / "260806_integrated_export"
 
 # 出力Excelファイル: 機械学習用データセットの保存先
-DEFAULT_OUTPUT_EXCEL = BASE_DIR / "data" / "example" / "機械学習用データセット.xlsx"
+DEFAULT_OUTPUT_EXCEL = BASE_DIR / "data" / "260806_検証用" / "260806_ML_dataset.xlsx"
 # ==========================================================
 
 

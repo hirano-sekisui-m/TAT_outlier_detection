@@ -61,13 +61,13 @@ PROJECT_ROOT = Path(__file__).resolve().parent.parent.parent
 
 # 1. 入力・出力パスの設定
 # 入力データセット: build_ml_dataset.py で出力されたExcelファイル
-DEFAULT_INPUT_DATASET = PROJECT_ROOT / "data" / "example" / "機械学習用データセット.xlsx"
+DEFAULT_INPUT_DATASET = PROJECT_ROOT / "data" / "260806_TAT1_dataset.xlsx"
 
 # サマリーレポートの出力先フォルダ
-DEFAULT_REPORT_DIR = PROJECT_ROOT / "reports" / "train"
+DEFAULT_REPORT_DIR = PROJECT_ROOT / "reports" / "train" / "260806_TAT1_ml_training"
 
 # 学習済みモデルの保存先フォルダ
-DEFAULT_MODEL_DIR = PROJECT_ROOT / "models" / "trained"
+DEFAULT_MODEL_DIR = PROJECT_ROOT / "models" / "trained" /"260806_TAT1_ml_models"
 
 
 # 2. タスク種別の選択: "classification" (分類) または "regression" (回帰)
@@ -87,10 +87,10 @@ def define_target_label(df: pd.DataFrame, task_type: str = TASK_TYPE) -> tuple[p
       - TAT1装置生データ、または特定の数値カラムを連続数値として予測対象にする
     """
     if task_type == "classification":
-        if "14-20/2-8" in df.columns:
-            val = pd.to_numeric(df["14-20/2-8"], errors="coerce")
+        if "205/206" in df.columns:
+            val = pd.to_numeric(df["205/206"], errors="coerce")
             target = (val > 1.15).astype(int)
-            target_def = "14-20/2-8 > 1.15"
+            target_def = "205/206 > 1.15"
         elif "終点/始点" in df.columns:
             val = pd.to_numeric(df["終点/始点"], errors="coerce")
             target = (val > 1.15).astype(int)
@@ -102,8 +102,8 @@ def define_target_label(df: pd.DataFrame, task_type: str = TASK_TYPE) -> tuple[p
         return target, target_def
 
     elif task_type == "regression":
-        target = pd.to_numeric(df["TAT1装置生データ"], errors="coerce")
-        target_def = "TAT1装置生データ"
+        target = pd.to_numeric(df["205/206"], errors="coerce")
+        target_def = "205/206"
         return target, target_def
 
     else:
@@ -112,7 +112,7 @@ def define_target_label(df: pd.DataFrame, task_type: str = TASK_TYPE) -> tuple[p
 
 # 4. 学習に使用する特徴量 (説明変数) の定義
 FEATURE_COLS = [
-    "TAT1装置生データ", "2-8", "4-10", "6-12", "8-14", "10-16", "12-18", "14-20",
+    "装置生データTAT1", "2-8", "4-10", "6-12", "8-14", "10-16", "12-18", "14-20",
     "平均", "最大", "最小", "レンジ", "最大上昇率", "最大上昇速度", "最大下落率", "最大下落速度",
     "4-10/2-8", "6-12/2-8", "8-14/2-8", "10-16/2-8", "12-18/2-8", "14-20/2-8"
 ]
