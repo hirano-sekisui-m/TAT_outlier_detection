@@ -14,18 +14,26 @@ import numpy as np
 import pandas as pd
 
 # Add data/example directory to path to import recalc_tat1_custom_points
-BASE_DIR = Path(__file__).resolve().parent.parent.parent
+BASE_DIR = Path(__file__).resolve().parent.parent
 sys.path.append(str(BASE_DIR / "data" / "example"))
 import recalc_tat1_custom_points as recalc  # type: ignore
 
 # ==========================================================
 # 設定エリア (パスを変更したい場合はここを書き換えてください)
 # ==========================================================
+def parse_path(path_str: str) -> Path:
+    """Windows等の絶対パスをコピペしても安全に読み込めるようにする"""
+    s = path_str.strip('\'"').replace("\\", "/").replace("¥", "/")
+    p = Path(s)
+    if not p.is_absolute():
+        return BASE_DIR / p
+    return p
+
 # 入力ディレクトリ: measurement.parquet や profile.parquet が入っているフォルダ
-DEFAULT_INPUT_DIR = BASE_DIR / "data" / "260806_検証用" / "260806_integrated_export"
+DEFAULT_INPUT_DIR = parse_path(r'data/260806_検証用/260806_integrated_export')
 
 # 出力Excelファイル: 機械学習用データセットの保存先
-DEFAULT_OUTPUT_EXCEL = BASE_DIR / "data" / "260806_検証用" / "260806_ML_dataset.xlsx"
+DEFAULT_OUTPUT_EXCEL = parse_path(r'data/260806_検証用/260806_ML_dataset.xlsx')
 # ==========================================================
 
 
