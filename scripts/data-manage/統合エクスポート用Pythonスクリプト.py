@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 """
 F07 CSV integrated exporter
 
@@ -37,13 +36,13 @@ import csv
 import json
 import re
 import shutil
-from datetime import datetime
+from collections.abc import Iterable, Sequence
+from datetime import datetime, timezone
 from io import StringIO
 from pathlib import Path
-from typing import Any, Dict, Iterable, List, Optional, Sequence, Tuple
+from typing import Any
 
 import pandas as pd
-
 
 # ==========================================================
 # 設定エリア (パスを変更したい場合はここを書き換えてください)
@@ -71,7 +70,7 @@ MISSING_STRINGS = {"", "None", "nan", "NaN", "<NA>"}
 # Public API
 # ==========================================================
 
-def process_csv(csv_path: Path | str, source_index: int = 1) -> Tuple[pd.DataFrame, pd.DataFrame, Dict[str, Any]]:
+def process_csv(csv_path: Path | str, source_index: int = 1) -> tuple[pd.DataFrame, pd.DataFrame, dict[str, Any]]:
     """
     単一の F07 生CSVを読み込み、measurement/profile/metadata に変換する。
 
@@ -107,7 +106,7 @@ def process_multiple_csvs(
     output_dir: Path | str,
     export_csv: bool = True,
     move_processed: bool = False,
-) -> Tuple[pd.DataFrame, pd.DataFrame, Dict[str, Any], Path]:
+) -> tuple[pd.DataFrame, pd.DataFrame, dict[str, Any], Path]:
     """
     複数CSVを個別にパースして統合し、エクスポートする。
 
@@ -134,10 +133,10 @@ def process_multiple_csvs(
     if missing:
         raise FileNotFoundError("入力CSVが見つかりません: " + ", ".join(missing))
 
-    measurement_list: List[pd.DataFrame] = []
-    profile_list: List[pd.DataFrame] = []
-    metadata_list: List[Dict[str, Any]] = []
-    errors: List[Dict[str, str]] = []
+    measurement_list: list[pd.DataFrame] = []
+    profile_list: list[pd.DataFrame] = []
+    metadata_list: list[dict[str, Any]] = []
+    errors: list[dict[str, str]] = []
 
     for idx, path in enumerate(paths, start=1):
         try:
@@ -145,7 +144,7 @@ def process_multiple_csvs(
             measurement_list.append(measurement_df)
             profile_list.append(profile_df)
             metadata_list.append(metadata)
-        except Exception as exc:
+        except Exception as exc:  # noqa: BLE001
             errors.append({"source_csv": path.name, "error": repr(exc)})
 
     if not measurement_list and not profile_list:
@@ -156,8 +155,8 @@ def process_multiple_csvs(
     metadata_all = merge_metadata(metadata_list, errors=errors)
 
     metadata_all["row_counts"] = {
-        "measurement": int(len(measurement_all)),
-        "profile": int(len(profile_all)),
+        "measurement": len(measurement_all),
+        "profile": len(profile_all),
     }
 
     output_path = export_integrated_data(
@@ -175,7 +174,7 @@ def process_multiple_csvs(
     return measurement_all, profile_all, metadata_all, output_path
 
 
-def load_parsed_data(parsed_dir: Path | str) -> Tuple[pd.DataFrame, pd.DataFrame, Dict[str, Any]]:
+def load_parsed_data(parsed_dir: Path | str) -> tuple[pd.DataFrame, pd.DataFrame, dict[str, Any]]:
     """エクスポート済みディレクトリから parquet/json を再読込する。"""
     parsed_dir = Path(parsed_dir)
 
@@ -192,23 +191,23 @@ def load_parsed_data(parsed_dir: Path | str) -> Tuple[pd.DataFrame, pd.DataFrame
 # Read helpers
 # ==========================================================
 
-def read_csv_lines(csv_path: Path) -> Tuple[List[str], str]:
+def read_csv_lines(csv_path: Path) -> tuple[list[str], str]:
     """CSVを複数エンコーディング候補で読み込む。"""
     encodings = ["cp932", "utf-8-sig", "utf-8"]
-    last_exc: Optional[Exception] = None
+    last_exc: Exception | None = None
 
     for enc in encodings:
         try:
             with open(csv_path, "r", encoding=enc, errors="strict", newline="") as f:
-                lines = [line.replace("\x00", "") for line in f.readlines()]
+                lines = [line.replace("\x00", "") for line in f]
                 return lines, enc
-        except Exception as exc:
+        except Exception as exc:  # noqa: BLE001
             last_exc = exc
 
     # 最終フォールバック。壊れた文字は置換して処理を継続する。
     try:
         with open(csv_path, "r", encoding="cp932", errors="replace", newline="") as f:
-            lines = [line.replace("\x00", "") for line in f.readlines()]
+            lines = [line.replace("\x00", "") for line in f]
             return lines, "cp932(errors=replace)"
     except Exception as exc:
         raise RuntimeError(f"CSVを読み込めません: {csv_path}, last_error={last_exc!r}") from exc
@@ -242,7 +241,7 @@ def find_measurement_header_idx(lines: Sequence[str]) -> int:
     raise ValueError("Measurement header not found.")
 
 
-def find_profile_header_idx(lines: Sequence[str], start: int = 0) -> Optional[int]:
+def find_profile_header_idx(lines: Sequence[str], start: int = 0) -> int | None:
     for i in range(start, len(lines)):
         line = lines[i]
         if "依頼No." in line and ("項目名" in line or "測光" in line or "ﾌﾟﾛﾌｧｲﾙ" in line or "処理値" in line):
@@ -254,7 +253,7 @@ def find_profile_header_idx(lines: Sequence[str], start: int = 0) -> Optional[in
 # Measurement parser
 # ==========================================================
 
-def parse_measurement_table(lines: Sequence[str]) -> Tuple[pd.DataFrame, Dict[str, Any]]:
+def parse_measurement_table(lines: Sequence[str]) -> tuple[pd.DataFrame, dict[str, Any]]:
     """測定値テーブルを DataFrame 化する。"""
     header_idx = find_measurement_header_idx(lines)
     profile_header_idx = find_profile_header_idx(lines, start=header_idx + 1)
@@ -270,7 +269,7 @@ def parse_measurement_table(lines: Sequence[str]) -> Tuple[pd.DataFrame, Dict[st
     csv_text = "".join(measurement_lines)
     try:
         df_raw = pd.read_csv(StringIO(csv_text), dtype=str, engine="python")
-    except Exception:
+    except Exception:  # noqa: BLE001
         # 一部装置CSVでは引用符が不完全な行が混ざることがあるため、
         # quote 処理を無効化して再読込する。
         df_raw = pd.read_csv(
@@ -292,8 +291,8 @@ def parse_measurement_table(lines: Sequence[str]) -> Tuple[pd.DataFrame, Dict[st
         if clean_col:
             out[clean_col] = df_raw[col].astype(str).str.strip().replace("nan", "")
 
-    measurement_items: List[str] = []
-    measurement_units: Dict[str, str] = {}
+    measurement_items: list[str] = []
+    measurement_units: dict[str, str] = {}
 
     idx = fixed_count
     while idx < len(original_columns):
@@ -347,7 +346,7 @@ def infer_fixed_column_count(columns: Sequence[Any]) -> int:
     return min(5, len(columns))
 
 
-def split_item_and_unit(raw_name: str) -> Tuple[str, str]:
+def split_item_and_unit(raw_name: str) -> tuple[str, str]:
     match = re.match(r"^(.*?)\((.*?)\)$", raw_name)
     if match:
         return match.group(1).strip(), match.group(2).strip()
@@ -369,15 +368,15 @@ def clean_series(series: pd.Series) -> pd.Series:
 # Profile parser
 # ==========================================================
 
-def parse_profile_table(lines: Sequence[str]) -> Tuple[pd.DataFrame, Dict[str, str]]:
+def parse_profile_table(lines: Sequence[str]) -> tuple[pd.DataFrame, dict[str, str]]:
     """プロファイルテーブルをロング形式 DataFrame に変換する。"""
     profile_header_idx = find_profile_header_idx(lines, start=0)
     if profile_header_idx is None:
         # プロファイルがないCSVも許容する。
         return pd.DataFrame(columns=["依頼No.", "項目名", "項目No.", "測光ﾎﾟｰﾄ", "処理値", "時間", "吸光度"]), {}
 
-    records: List[Dict[str, Any]] = []
-    item_mapping: Dict[str, str] = {}
+    records: list[dict[str, Any]] = []
+    item_mapping: dict[str, str] = {}
 
     i = profile_header_idx + 1
     while i < len(lines):
@@ -433,10 +432,10 @@ def parse_profile_table(lines: Sequence[str]) -> Tuple[pd.DataFrame, Dict[str, s
     return profile_df[expected_cols].reset_index(drop=True), item_mapping
 
 
-def parse_csv_line(line: str) -> List[str]:
+def parse_csv_line(line: str) -> list[str]:
     try:
         return [cell.replace('"', "").strip() for cell in next(csv.reader([line]))]
-    except Exception:
+    except Exception:  # noqa: BLE001
         return [cell.replace('"', "").strip() for cell in line.strip().split(",")]
 
 
@@ -456,7 +455,7 @@ def looks_like_profile_row1(tokens: Sequence[str]) -> bool:
     return request_no != "" and item_name != "" and is_number_like(item_no) and is_number_like(port)
 
 
-def find_next_absorbance_row(lines: Sequence[str], start: int) -> Optional[int]:
+def find_next_absorbance_row(lines: Sequence[str], start: int) -> int | None:
     for j in range(start, min(start + 5, len(lines))):
         if is_blank_csv_line(lines[j]):
             continue
@@ -476,7 +475,7 @@ def is_number_like(value: Any) -> bool:
     try:
         float(s)
         return True
-    except Exception:
+    except (ValueError, TypeError):
         return False
 
 
@@ -484,15 +483,15 @@ def to_number(value: Any) -> float:
     return pd.to_numeric(value, errors="coerce")
 
 
-def parse_numeric_tokens(tokens: Iterable[Any]) -> List[float]:
-    values: List[float] = []
+def parse_numeric_tokens(tokens: Iterable[Any]) -> list[float]:
+    values: list[float] = []
     for token in tokens:
         s = str(token).strip()
         if s == "":
             continue
         try:
             values.append(float(s))
-        except Exception:
+        except (ValueError, TypeError):
             continue
     return values
 
@@ -521,12 +520,12 @@ def concat_dataframes(dfs: Sequence[pd.DataFrame]) -> pd.DataFrame:
     return pd.concat(dfs, axis=0, ignore_index=True, sort=False)
 
 
-def merge_metadata(metadata_list: Sequence[Dict[str, Any]], errors: Optional[List[Dict[str, str]]] = None) -> Dict[str, Any]:
-    source_files: List[str] = []
-    encodings: Dict[str, str] = {}
-    measurement_items: List[str] = []
-    measurement_units: Dict[str, str] = {}
-    item_mapping: Dict[str, str] = {}
+def merge_metadata(metadata_list: Sequence[dict[str, Any]], errors: list[dict[str, str]] | None = None) -> dict[str, Any]:
+    source_files: list[str] = []
+    encodings: dict[str, str] = {}
+    measurement_items: list[str] = []
+    measurement_units: dict[str, str] = {}
+    item_mapping: dict[str, str] = {}
 
     for meta in metadata_list:
         source = meta.get("source_csv", "")
@@ -551,7 +550,7 @@ def merge_metadata(metadata_list: Sequence[Dict[str, Any]], errors: Optional[Lis
         "measurement_items": measurement_items,
         "measurement_units": measurement_units,
         "item_mapping": item_mapping,
-        "exported_at": datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
+        "exported_at": datetime.now(timezone.utc).astimezone().strftime("%Y-%m-%d %H:%M:%S"),
         "errors": errors or [],
     }
 
@@ -559,7 +558,7 @@ def merge_metadata(metadata_list: Sequence[Dict[str, Any]], errors: Optional[Lis
 def export_integrated_data(
     measurement_df: pd.DataFrame,
     profile_df: pd.DataFrame,
-    metadata: Dict[str, Any],
+    metadata: dict[str, Any],
     output_dir: Path | str,
     export_csv: bool = True,
 ) -> Path:
@@ -612,7 +611,7 @@ def move_original_csv(csv_path: Path | str) -> Path:
     processed_dir = csv_path.parent / "processed"
     processed_dir.mkdir(exist_ok=True)
 
-    timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+    timestamp = datetime.now(timezone.utc).astimezone().strftime("%Y%m%d_%H%M%S")
     dest = processed_dir / f"{timestamp}_{csv_path.name}"
     shutil.move(str(csv_path), str(dest))
     return dest
@@ -633,13 +632,13 @@ def try_parse_json_obj(value: Any) -> Any:
         if s.startswith("{") and s.endswith("}"):
             try:
                 return json.loads(s)
-            except Exception:
+            except ValueError:
                 return None
         return s
     return None
 
 
-def extract_sample_id(measurement_df: pd.DataFrame, preferred_keys: Optional[List[str]] = None) -> pd.Series:
+def extract_sample_id(measurement_df: pd.DataFrame, preferred_keys: list[str] | None = None) -> pd.Series:
     """measurement_df から検体ID候補を抽出する。"""
     if preferred_keys is None:
         preferred_keys = ["SID", "検体ID", "PID", "SampleID", "ID", "検体ﾊﾞｰｺｰﾄﾞ", "属性", "依頼No."]
@@ -653,7 +652,7 @@ def extract_sample_id(measurement_df: pd.DataFrame, preferred_keys: Optional[Lis
             parsed = series.map(try_parse_json_obj)
             if parsed.dropna().apply(lambda x: isinstance(x, dict)).any():
                 for inner_key in ["SID", "検体ID", "PID", "SampleID", "ID"]:
-                    extracted = parsed.map(lambda d: d.get(inner_key) if isinstance(d, dict) else None)
+                    extracted = parsed.map(lambda d, key=inner_key: d.get(key) if isinstance(d, dict) else None)
                     s = extracted.astype(str).str.strip()
                     if not s.isin(list(MISSING_STRINGS)).all():
                         return s
@@ -666,7 +665,7 @@ def extract_sample_id(measurement_df: pd.DataFrame, preferred_keys: Optional[Lis
     return measurement_df[first_col].astype(str).str.strip()
 
 
-def detect_prescription_columns(measurement_df: pd.DataFrame, metadata: Dict[str, Any]) -> List[str]:
+def detect_prescription_columns(measurement_df: pd.DataFrame, metadata: dict[str, Any]) -> list[str]:
     """metadata の measurement_items と measurement_df 列名の交差を返す。"""
     items = metadata.get("measurement_items", []) if metadata else []
     common = [c for c in measurement_df.columns if c in items]
@@ -691,7 +690,7 @@ def load_parsed_for_analysis(parsed_dir: Path | str, sample_id_col_name: str = "
 # CLI
 # ==========================================================
 
-def discover_input_files(args: argparse.Namespace) -> List[Path]:
+def discover_input_files(args: argparse.Namespace) -> list[Path]:
     if args.csv_files:
         return [Path(p) for p in args.csv_files]
 
@@ -721,7 +720,7 @@ def build_arg_parser() -> argparse.ArgumentParser:
     return parser
 
 
-def main(argv: Optional[Sequence[str]] = None) -> int:
+def main(argv: Sequence[str] | None = None) -> int:
     parser = build_arg_parser()
     args = parser.parse_args(argv)
 
