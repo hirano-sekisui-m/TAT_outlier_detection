@@ -65,13 +65,13 @@ TASK_TYPE = "classification"
 def define_target_label(df: pd.DataFrame, task_type: str = TASK_TYPE) -> pd.Series:
     if task_type == "classification":
         # 【分類の書き換え例】
-        # 14-20/2-8 (終点/始点比率) が 1.15 を超える場合を 1 (高乖離陽性)、それ以外を 0 と定義
-        val = pd.to_numeric(df["14-20/2-8"], errors="coerce")
+        # 205/206比 が 1.15 を超える場合を 1 (高値乖離)、それ以外を 0 (非乖離)と定義
+        val = pd.to_numeric(df["205/206比"], errors="coerce")
         return (val > 1.15).astype(int)
     else:
         # 【回帰の書き換え例】
-        # 装置生データをそのまま連続数値ターゲットとして予測対象にする
-        return pd.to_numeric(df["TAT1装置生データ"], errors="coerce")
+        # 「205/206比」をそのまま連続数値ターゲットとして予測対象にする
+        return pd.to_numeric(df["205/206比"], errors="coerce")
 
 # 4. パラメータ
 RANDOM_STATE = 42

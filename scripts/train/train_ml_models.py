@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 """
 Flexible Machine Learning Model Training & Evaluation Script.
 
@@ -10,24 +9,22 @@ Evaluates multiple algorithms via Cross-Validation and generates comprehensive s
 import argparse
 import json
 import platform
-import sys
 import warnings
-from pathlib import Path
 from datetime import datetime
-from typing import Tuple
+from pathlib import Path
 
 warnings.filterwarnings("ignore")
 
 import joblib
 import numpy as np
 import pandas as pd
+
+# Scikit-learn imports
+import sklearn
 from openpyxl import load_workbook
 from openpyxl.styles import Alignment, Font, PatternFill
 from openpyxl.utils import get_column_letter
 from openpyxl.worksheet.table import Table, TableStyleInfo
-
-# Scikit-learn imports
-import sklearn
 from sklearn.ensemble import (
     ExtraTreesClassifier,
     ExtraTreesRegressor,
@@ -36,7 +33,7 @@ from sklearn.ensemble import (
     RandomForestClassifier,
     RandomForestRegressor,
 )
-from sklearn.linear_model import LogisticRegression, Ridge, Lasso
+from sklearn.linear_model import Lasso, LogisticRegression, Ridge
 from sklearn.metrics import (
     accuracy_score,
     average_precision_score,
@@ -53,7 +50,6 @@ from sklearn.model_selection import KFold, StratifiedKFold, cross_val_predict
 from sklearn.pipeline import make_pipeline
 from sklearn.preprocessing import StandardScaler
 from sklearn.svm import SVC, SVR
-
 
 # プロジェクトルートディレクトリの設定
 PROJECT_ROOT = Path(__file__).resolve().parent.parent.parent
@@ -79,7 +75,7 @@ TASK_TYPE = "classification"
 
 
 # 3. 正解ラベル (Target) の動的定義関数
-def define_target_label(df: pd.DataFrame, task_type: str = TASK_TYPE) -> Tuple[pd.Series, str]:
+def define_target_label(df: pd.DataFrame, task_type: str = TASK_TYPE) -> tuple[pd.Series, str]:
     """
     Pythonスクリプト内で正解ラベル(目的変数)を柔軟に定義します。
     (ターゲット要素の Series, 正解ラベルの定義説明テキスト) のタプルを返します。
