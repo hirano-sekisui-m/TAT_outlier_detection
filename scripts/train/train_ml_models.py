@@ -10,10 +10,8 @@ import argparse
 import json
 import platform
 import warnings
-from datetime import datetime
+from datetime import datetime, timezone
 from pathlib import Path
-
-warnings.filterwarnings("ignore")
 
 import joblib
 import numpy as np
@@ -50,6 +48,8 @@ from sklearn.model_selection import KFold, StratifiedKFold, cross_val_predict
 from sklearn.pipeline import make_pipeline
 from sklearn.preprocessing import StandardScaler
 from sklearn.svm import SVC, SVR
+
+warnings.filterwarnings("ignore")
 
 # プロジェクトルートディレクトリの設定
 PROJECT_ROOT = Path(__file__).resolve().parent.parent.parent
@@ -164,11 +164,11 @@ def evaluate_classification_model(model_name: str, model, X: pd.DataFrame, y: pd
     f1 = f1_score(y, y_pred, zero_division=0)
     try:
         auc = roc_auc_score(y, y_prob)
-    except Exception:
+    except ValueError:
         auc = np.nan
     try:
         ap = average_precision_score(y, y_prob)
-    except Exception:
+    except ValueError:
         ap = np.nan
 
     cm = confusion_matrix(y, y_pred, labels=[0, 1])
@@ -263,7 +263,7 @@ def format_excel_report(excel_path: Path):
                     showColumnStripes=False,
                 )
                 ws.add_table(table)
-            except Exception:
+            except ValueError:
                 pass
 
         for col_idx in range(1, ws.max_column + 1):
@@ -388,7 +388,7 @@ def run_training(
         "target_definition": target_definition,
         "feature_cols": available_features,
         "metrics": df_metrics.to_dict(orient="records"),
-        "trained_at": datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
+        "trained_at": datetime.now(timezone.utc).astimezone().strftime("%Y-%m-%d %H:%M:%S"),
         "versions": {
             "python": platform.python_version(),
             "sklearn": sklearn.__version__,
@@ -409,7 +409,7 @@ def run_training(
         df_preds.to_excel(writer, sheet_name="CV_Predictions", index=False)
         
         summary_info = pd.DataFrame([
-            {"項目": "実行日時", "値": datetime.now().strftime("%Y-%m-%d %H:%M:%S")},
+            {"項目": "実行日時", "値": datetime.now(timezone.utc).astimezone().strftime("%Y-%m-%d %H:%M:%S")},
             {"項目": "タスク種別", "値": task_type.upper()},
             {"項目": "正解ラベル定義", "値": target_definition},
             {"項目": "入力データセット", "値": str(input_dataset)},
@@ -429,7 +429,7 @@ def run_training(
     report_json = {
         "task_type": task_type,
         "target_definition": target_definition,
-        "executed_at": datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
+        "executed_at": datetime.now(timezone.utc).astimezone().strftime("%Y-%m-%d %H:%M:%S"),
         "dataset": str(input_dataset),
         "n_samples": len(X_clean),
         "features": available_features,
