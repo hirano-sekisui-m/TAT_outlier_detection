@@ -3,4 +3,5 @@ numpy
 scikit-learn
 openpyxl
 joblib
+pyarrow
 ruff
