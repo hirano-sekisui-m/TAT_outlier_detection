@@ -114,6 +114,7 @@ def process_multiple_csvs(
     output_dir: Path | str,
     export_csv: bool = True,
     move_processed: bool = False,
+    cp_param: dict | None = None,
 ) -> tuple[pd.DataFrame, pd.DataFrame, dict[str, Any], Path]:
     """
     複数CSVを個別にパースして統合し、エクスポートする。
@@ -160,7 +161,7 @@ def process_multiple_csvs(
 
     measurement_all = concat_dataframes(measurement_list)
     profile_all = concat_dataframes(profile_list)
-    metadata_all = merge_metadata(metadata_list, errors=errors)
+    metadata_all = merge_metadata(metadata_list, errors=errors, cp_param=cp_param)
 
     metadata_all["row_counts"] = {
         "measurement": len(measurement_all),
@@ -545,7 +546,7 @@ def concat_dataframes(dfs: Sequence[pd.DataFrame]) -> pd.DataFrame:
     return pd.concat(dfs, axis=0, ignore_index=True, sort=False)
 
 
-def merge_metadata(metadata_list: Sequence[dict[str, Any]], errors: list[dict[str, str]] | None = None) -> dict[str, Any]:
+def merge_metadata(metadata_list: Sequence[dict[str, Any]], errors: list[dict[str, str]] | None = None, cp_param: dict | None = None) -> dict[str, Any]:
     source_files: list[str] = []
     encodings: dict[str, str] = {}
     measurement_items: list[str] = []
@@ -569,7 +570,7 @@ def merge_metadata(metadata_list: Sequence[dict[str, Any]], errors: list[dict[st
             # 既存値と矛盾しない限り保持。矛盾する場合は既存優先。
             item_mapping.setdefault(str(key), value)
 
-    return {
+    meta = {
         "source_csv_files": source_files,
         "source_encodings": encodings,
         "measurement_items": measurement_items,
@@ -578,6 +579,9 @@ def merge_metadata(metadata_list: Sequence[dict[str, Any]], errors: list[dict[st
         "exported_at": datetime.now(timezone.utc).astimezone().strftime("%Y-%m-%d %H:%M:%S"),
         "errors": errors or [],
     }
+    if cp_param:
+        meta["cp_param"] = cp_param
+    return meta
 
 
 def export_integrated_data(
@@ -742,6 +746,7 @@ def build_arg_parser() -> argparse.ArgumentParser:
     parser.add_argument("--output-dir", default=str(DEFAULT_OUTPUT_DIR), help=f"出力先ディレクトリ (既定: {DEFAULT_OUTPUT_DIR})")
     parser.add_argument("--no-csv", action="store_true", help="確認用CSVを出力しない")
     parser.add_argument("--move-processed", action="store_true", help="成功後、入力CSVを processed/ に移動する")
+    parser.add_argument("--cp-param", default=None, help="CP_param JSONファイルのパス (metadataに追記する場合)")
     return parser
 
 
@@ -750,6 +755,12 @@ def main(argv: Sequence[str] | None = None) -> int:
     args = parser.parse_args(argv)
 
     csv_paths = discover_input_files(args)
+
+    cp_param = None
+    if args.cp_param:
+        import json
+        with open(args.cp_param, "r", encoding="utf-8") as f:
+            cp_param = json.load(f)
 
     print("Input CSV files:")
     for p in csv_paths:
@@ -760,6 +771,7 @@ def main(argv: Sequence[str] | None = None) -> int:
         output_dir=args.output_dir,
         export_csv=not args.no_csv,
         move_processed=args.move_processed,
+        cp_param=cp_param,
     )
 
     print()
