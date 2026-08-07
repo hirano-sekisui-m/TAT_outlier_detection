@@ -47,13 +47,21 @@ import pandas as pd
 # ==========================================================
 # 設定エリア (パスを変更したい場合はここを書き換えてください)
 # ==========================================================
-PROJECT_ROOT = Path(__file__).resolve().parent.parent.parent
+PROJECT_ROOT = Path(__file__).resolve().parent.parent
+
+def parse_path(path_str: str) -> Path:
+    """Windows等の絶対パスをコピペしても安全に読み込めるようにする"""
+    s = path_str.strip('\'"').replace("\\", "/").replace("¥", "/")
+    p = Path(s)
+    if not p.is_absolute():
+        return PROJECT_ROOT / p
+    return p
 
 # 入力生CSVが含まれるフォルダパス
-DEFAULT_INPUT_DIR = PROJECT_ROOT / "data" / "260806_検証用"
+DEFAULT_INPUT_DIR = parse_path(r'data/260806_検証用')
 
 # 統合データ (measurement.parquet, profile.parquet等) の出力先フォルダパス
-DEFAULT_OUTPUT_DIR = PROJECT_ROOT / "data" / "260806_検証用" / "260806_integrated_export"
+DEFAULT_OUTPUT_DIR = parse_path(r'data/260806_検証用/260806_integrated_export')
 # ==========================================================
 
 

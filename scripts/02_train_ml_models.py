@@ -52,22 +52,30 @@ from sklearn.svm import SVC, SVR
 warnings.filterwarnings("ignore")
 
 # プロジェクトルートディレクトリの設定
-PROJECT_ROOT = Path(__file__).resolve().parent.parent.parent
+PROJECT_ROOT = Path(__file__).resolve().parent.parent
 
 
 # ==========================================================
 # 設定エリア (パスや学習条件を変更したい場合はここを修正してください)
 # ==========================================================
 
+def parse_path(path_str: str) -> Path:
+    """Windows等の絶対パスをコピペしても安全に読み込めるようにする"""
+    s = path_str.strip('\'"').replace("\\", "/").replace("¥", "/")
+    p = Path(s)
+    if not p.is_absolute():
+        return PROJECT_ROOT / p
+    return p
+
 # 1. 入力・出力パスの設定
 # 入力データセット: build_ml_dataset.py で出力されたExcelファイル
-DEFAULT_INPUT_DATASET = PROJECT_ROOT / "data" / "260806_TAT1_dataset.xlsx"
+DEFAULT_INPUT_DATASET = parse_path(r'data/260806_TAT1_dataset.xlsx')
 
 # サマリーレポートの出力先フォルダ
-DEFAULT_REPORT_DIR = PROJECT_ROOT / "reports" / "train" / "260806_TAT1_ml_training"
+DEFAULT_REPORT_DIR = parse_path(r'reports/train/260806_TAT1_ml_training')
 
 # 学習済みモデルの保存先フォルダ
-DEFAULT_MODEL_DIR = PROJECT_ROOT / "models" / "trained" /"260806_TAT1_ml_models"
+DEFAULT_MODEL_DIR = parse_path(r'models/trained/260806_TAT1_ml_models')
 
 
 # 2. タスク種別の選択: "classification" (分類) または "regression" (回帰)
