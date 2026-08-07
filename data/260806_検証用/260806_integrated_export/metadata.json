@@ -1,0 +1,51 @@
+{
+  "source_csv_files": [
+    "240517_calCSV_data.csv",
+    "CSV_data_F07_240529_i-Lab検体20+50.csv"
+  ],
+  "source_encodings": {
+    "240517_calCSV_data.csv": "cp932",
+    "CSV_data_F07_240529_i-Lab検体20+50.csv": "cp932"
+  },
+  "measurement_items": [
+    "TAT206",
+    "TAT1",
+    "TAT2",
+    "TAT3",
+    "TAT4",
+    "TAT5",
+    "TAT6",
+    "TAT7",
+    "TAT8",
+    "TAT9",
+    "TAT10"
+  ],
+  "measurement_units": {
+    "TAT206": "ng/mL",
+    "TAT1": "ng/mL",
+    "TAT2": "ng/mL",
+    "TAT3": "ng/mL",
+    "TAT4": "ng/mL",
+    "TAT5": "ng/mL",
+    "TAT6": "ng/mL",
+    "TAT7": "ng/mL",
+    "TAT8": "ng/mL",
+    "TAT9": "ng/mL",
+    "TAT10": "ng/mL"
+  },
+  "item_mapping": {
+    "41": "TAT206",
+    "42": "TAT1",
+    "43": "TAT2",
+    "44": "TAT3",
+    "45": "TAT4",
+    "46": "TAT5",
+    "47": "TAT6"
+  },
+  "exported_at": "2026-08-06 11:39:45",
+  "errors": [],
+  "row_counts": {
+    "measurement": 182,
+    "profile": 11235
+  }
+}

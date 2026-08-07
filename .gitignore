@@ -7,7 +7,7 @@ __pycache__/
 .venv/
 
 # 測定データなど
-data/
+# data/
 
 # モデル構築レポート
 reports/
