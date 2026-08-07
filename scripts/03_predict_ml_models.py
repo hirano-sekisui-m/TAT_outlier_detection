@@ -18,7 +18,7 @@ from openpyxl.styles import Alignment, Font, PatternFill
 from openpyxl.utils import get_column_letter
 from openpyxl.worksheet.table import Table, TableStyleInfo
 
-PROJECT_ROOT = Path(__file__).resolve().parent.parent.parent
+PROJECT_ROOT = Path(__file__).resolve().parent.parent
 
 logger = logging.getLogger(__name__)
 
@@ -26,14 +26,22 @@ logger = logging.getLogger(__name__)
 # 設定エリア (パスを変更したい場合はここを書き換えてください)
 # ==========================================================
 
+def parse_path(path_str: str) -> Path:
+    """Windows等の絶対パスをコピペしても安全に読み込めるようにする"""
+    s = path_str.strip('\'"').replace("\\", "/").replace("¥", "/")
+    p = Path(s)
+    if not p.is_absolute():
+        return PROJECT_ROOT / p
+    return p
+
 # 1. 検証・予測対象の未知データセット (Excel / CSV)
-DEFAULT_INPUT_DATASET = PROJECT_ROOT / "data" / "260806_検証用" / "260806_ML_dataset.xlsx"
+DEFAULT_INPUT_DATASET = parse_path(r'data/260806_検証用/260806_ML_dataset.xlsx')
 
 # 2. 読み込む学習済みモデル (.joblib)
-DEFAULT_MODEL_FILE = PROJECT_ROOT / "models" / "trained" / "260806_TAT1_ml_models" / "best_model_regression_RandomForestRegressor.joblib"
+DEFAULT_MODEL_FILE = parse_path(r'models/trained/260806_TAT1_ml_models/best_model_regression_RandomForestRegressor.joblib')
 
 # 3. 予測結果の出力Excelファイルパス
-DEFAULT_OUTPUT_EXCEL = PROJECT_ROOT / "reports" / "validation" / "regression_prediction_results.xlsx"
+DEFAULT_OUTPUT_EXCEL = parse_path(r'reports/validation/regression_prediction_results.xlsx')
 
 # ==========================================================
 
